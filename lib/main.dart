@@ -1,3 +1,5 @@
+import 'dart:html';
+
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
@@ -36,6 +38,27 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   bool turnOfCircle = true;
   List<PieceStatus> statusList = List.filled(9, PieceStatus.none);
+  GameStatus gameStatus = GameStatus.play;
+
+  //縦の勝ちパターン
+  final List<List<int>> settlementListHorizontal = [
+    [0,1,2],
+    [3,4,5],
+    [6,7,8]
+  ];
+
+  //横の勝ちパターン
+  final List<List<int>> settlementListVertical = [
+    [0,3,6],
+    [1,4,7],
+    [2,5,8]
+  ];
+
+  //斜めの勝ちパターン
+  final List<List<int>> settlementListDiagonal = [
+    [0,4,8],
+    [2,4,6]
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -59,16 +82,17 @@ class _MyHomePageState extends State<MyHomePage> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Row(
-                  children: [
-                    turnOfCircle ? Icon(FontAwesomeIcons.circle) : Icon(Icons.clear),
-                    Text('の番です'),
-                  ],
-                ),
+                buildText(),
                 OutlineButton(
                   borderSide: BorderSide(),
                   child: Text('クリア'),
+                  //クリアボタンを押下するとリセットする処理を追加
                   onPressed: () {
+                    setState(() {
+                      turnOfCircle = true;
+                      statusList = List.filled(9, PieceStatus.none);
+                      gameStatus = GameStatus.play;
+                    });
 
                   },
                 )
@@ -81,32 +105,38 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
+  Widget buildText() {
+    switch(gameStatus) {
+      case GameStatus.play:
+        return Row(
+          children: [
+            turnOfCircle ? Icon(FontAwesomeIcons.circle) : Icon(Icons.clear),
+            Text('の番です'),
+          ],
+        );
+       break;
+     case GameStatus.draw:
+        return Text('引き分けです');
+        break;
+     case GameStatus.settlement:
+        return Row(
+          children: [
+            !turnOfCircle ? Icon(FontAwesomeIcons.circle) : Icon(Icons.clear),
+            Text('の勝ちです'),
+          ],
+        );
+        break;
+      default:
+       return Container();
+     }
+  }
+
   Widget buildField() {
     //縦３列を作成するリスト
     List<Widget>_columnChildren = [Divider(height: 0.0, color: Colors.black,)];
     //横３列を作成するリスト
     List<Widget>_rowChildren = [];
     GameStatus gameStatus = GameStatus.play;
-
-    //縦の勝ちパターン
-    final List<List<int>> settlementListHorizontal = [
-      [0,1,2],
-      [3,4,5],
-      [6,7,8]
-    ];
-
-    //横の勝ちパターン
-    final List<List<int>> settlementListVertivcal = [
-      [0,3,6],
-      [1,4,7],
-      [2,5,8]
-    ];
-
-    //斜めの勝ちパターン
-    final List<List<int>> settlementListDiagonal = [
-      [0,4,8],
-      [2,4,6]
-    ];
 
     for(int j = 0; j < 3; j++) {
       //横の行作成
@@ -115,16 +145,15 @@ class _MyHomePageState extends State<MyHomePage> {
         _rowChildren.add(
           Expanded(
               child: InkWell(
-                onTap:  () {
-                  //まだ押されていない時だけ押せるようにする
+                onTap: gameStatus == GameStatus.play ? () {
+                  //まだ押されていないときだけ押せるようにする
                   if (statusList[_index] == PieceStatus.none) {
                     statusList[_index] = turnOfCircle ? PieceStatus.circle : PieceStatus.cross;
                     turnOfCircle = !turnOfCircle; //◯×切り替え
+                    confirmResult();
                   }
-                  setState(() {
-
-                  });
-                },
+                  setState(() {});
+                } : null,
                 child: AspectRatio(
                   aspectRatio: 1.0,
                   child: Row(
@@ -168,6 +197,35 @@ class _MyHomePageState extends State<MyHomePage> {
         break;
       default:
         return Container();
+    }
+  }
+
+  //勝敗判定
+  void confirmResult() {
+    //引き分けのとき
+    if (!statusList.contains(PieceStatus.none)) {
+      gameStatus = GameStatus.draw;
+    }
+
+    //行における勝敗のパターンを検証
+    for (int i = 0; i < settlementListHorizontal.length; i++) {
+      if (statusList[settlementListHorizontal[i][0]] == statusList[settlementListHorizontal[i][1]] && statusList[settlementListHorizontal[i][1]] == statusList[settlementListHorizontal[i][2]] && statusList[settlementListHorizontal[i][0]] != PieceStatus.none) {
+        gameStatus = GameStatus.settlement;
+      }
+    }
+
+    //列における勝敗のパターンを検証
+    for (int i = 0; i < settlementListVertical.length; i++) {
+      if (statusList[settlementListVertical[i][0]] == statusList[settlementListVertical[i][1]] && statusList[settlementListVertical[i][1]] == statusList[settlementListVertical[i][2]] && statusList[settlementListVertical[i][0]] != PieceStatus.none) {
+        gameStatus = GameStatus.settlement;
+      }
+    }
+
+    //斜めにおける勝敗のパターンを検証
+    for (int i = 0; i < settlementListDiagonal.length; i++) {
+      if (statusList[settlementListDiagonal[i][0]] == statusList[settlementListDiagonal[i][1]] && statusList[settlementListDiagonal[i][1]] == statusList[settlementListDiagonal[i][2]] && statusList[settlementListDiagonal[i][0]] != PieceStatus.none) {
+        gameStatus = GameStatus.settlement;
+      }
     }
   }
 }
