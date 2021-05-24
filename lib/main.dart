@@ -86,6 +86,27 @@ class _MyHomePageState extends State<MyHomePage> {
     List<Widget>_columnChildren = [Divider(height: 0.0, color: Colors.black,)];
     //横３列を作成するリスト
     List<Widget>_rowChildren = [];
+    GameStatus gameStatus = GameStatus.play;
+
+    //縦の勝ちパターン
+    final List<List<int>> settlementListHorizontal = [
+      [0,1,2],
+      [3,4,5],
+      [6,7,8]
+    ];
+
+    //横の勝ちパターン
+    final List<List<int>> settlementListVertivcal = [
+      [0,3,6],
+      [1,4,7],
+      [2,5,8]
+    ];
+
+    //斜めの勝ちパターン
+    final List<List<int>> settlementListDiagonal = [
+      [0,4,8],
+      [2,4,6]
+    ];
 
     for(int j = 0; j < 3; j++) {
       //横の行作成
@@ -148,9 +169,6 @@ class _MyHomePageState extends State<MyHomePage> {
       default:
         return Container();
     }
-    return Container(
-      child: Icon(FontAwesomeIcons.circle, size: 60,),
-   );
   }
 }
 

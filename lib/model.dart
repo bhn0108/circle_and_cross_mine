@@ -3,3 +3,9 @@ enum PieceStatus {
   circle,
   cross
 }
+
+enum GameStatus {
+  play,
+  draw,
+  settlement
+}
