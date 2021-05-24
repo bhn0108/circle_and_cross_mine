@@ -32,14 +32,8 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+  bool turnOfCircle = true;
 
-  void _incrementCounter() {
-    setState(() {
-
-      _counter++;
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -50,43 +44,76 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(FontAwesomeIcons.circle, color: Colors.green, size: 30,),
-            Icon(Icons.clear, color: Colors.red, size:30,),
+            Icon(FontAwesomeIcons.circle,),
+            Icon(Icons.clear,),
             Text('ゲーム')
           ],
         ),
       ),
-      body: buildField(),
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    turnOfCircle ? Icon(FontAwesomeIcons.circle) : Icon(Icons.clear),
+                    Text('の番です'),
+                  ],
+                ),
+                OutlineButton(
+                  borderSide: BorderSide(),
+                  child: Text('クリア'),
+                  onPressed: () {
+
+                  },
+                )
+              ],
+            ),
+          ),
+          buildField(),
+        ],
+      ),
     );
   }
 
-  Column buildField() {
+  Widget buildField() {
     //縦３列を作成するリスト
-    List<Widget>_columnChildren = [];
+    List<Widget>_columnChildren = [Divider(height: 0.0, color: Colors.black,)];
     //横３列を作成するリスト
     List<Widget>_rowChildren = [];
 
-    for(int h = 0; h < 3; h++) {
+    for(int j = 0; j < 3; j++) {
       //横の行作成
       for(int i = 0; i < 3; i++) {
         _rowChildren.add(
-          Expanded(child: AspectRatio(
-              aspectRatio: 1.0,
-              child: i == 2 ?
-              Container()
-                  : Row(
-                children: [
-                  Expanded(child: Container()),
-                  VerticalDivider(width: 0.0, color: Colors.black,),
-                ],
+          Expanded(
+              child: InkWell(
+                onTap:  () {
+                  turnOfCircle = !turnOfCircle; //◯×切り替え
+                  setState(() {
+
+                  });
+                },
+                child: AspectRatio(
+                  aspectRatio: 1.0,
+                  child: Row(
+                    children: [
+                        Expanded(child: Container()),
+                      (i == 2) ? Container() : VerticalDivider(width: 0.0, color: Colors.black,),
+                  ],
+                )
+          ),
               )
           )
-          ),
         );
       }
 
-      _columnChildren.add(Row(children: _rowChildren,));
-      _columnChildren.add(Divider(height: 0.0, color: Colors.black,));
+      _columnChildren
+      ..add(Row(children: _rowChildren,))
+      ..add(Divider(height: 0.0, color: Colors.black,));
 
       _rowChildren = [];
     }
