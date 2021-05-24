@@ -56,28 +56,42 @@ class _MyHomePageState extends State<MyHomePage> {
           ],
         ),
       ),
-      body: Center(
-
-        child: Column(
-
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headline4,
-            ),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+      body: buildField(),
     );
+  }
+
+  Column buildField() {
+    //縦３列を作成するリスト
+    List<Widget>_columnChildren = [];
+    //横３列を作成するリスト
+    List<Widget>_rowChildren = [];
+
+    for(int h = 0; h < 3; h++) {
+      //横の行作成
+      for(int i = 0; i < 3; i++) {
+        _rowChildren.add(
+          Expanded(child: AspectRatio(
+              aspectRatio: 1.0,
+              child: i == 2 ?
+              Container()
+                  : Row(
+                children: [
+                  Expanded(child: Container()),
+                  VerticalDivider(width: 0.0, color: Colors.black,),
+                ],
+              )
+          )
+          ),
+        );
+      }
+
+      _columnChildren.add(Row(children: _rowChildren,));
+      _columnChildren.add(Divider(height: 0.0, color: Colors.black,));
+
+      _rowChildren = [];
+    }
+
+    return Column(children: _columnChildren,);
   }
 }
 
