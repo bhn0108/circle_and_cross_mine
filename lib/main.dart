@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
+import 'model.dart';
+
 void main() {
   runApp(MyApp());
 }
@@ -33,7 +35,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   bool turnOfCircle = true;
-
+  List<PieceStatus> statusList = List.filled(9, PieceStatus.none);
 
   @override
   Widget build(BuildContext context) {
@@ -88,11 +90,16 @@ class _MyHomePageState extends State<MyHomePage> {
     for(int j = 0; j < 3; j++) {
       //横の行作成
       for(int i = 0; i < 3; i++) {
+        int _index = j * 3 + i;
         _rowChildren.add(
           Expanded(
               child: InkWell(
                 onTap:  () {
-                  turnOfCircle = !turnOfCircle; //◯×切り替え
+                  //まだ押されていない時だけ押せるようにする
+                  if (statusList[_index] == PieceStatus.none) {
+                    statusList[_index] = turnOfCircle ? PieceStatus.circle : PieceStatus.cross;
+                    turnOfCircle = !turnOfCircle; //◯×切り替え
+                  }
                   setState(() {
 
                   });
@@ -101,7 +108,9 @@ class _MyHomePageState extends State<MyHomePage> {
                   aspectRatio: 1.0,
                   child: Row(
                     children: [
-                        Expanded(child: Container()),
+                      Expanded(
+                          child: buildContainer(statusList[_index])
+                      ),
                       (i == 2) ? Container() : VerticalDivider(width: 0.0, color: Colors.black,),
                   ],
                 )
@@ -119,6 +128,29 @@ class _MyHomePageState extends State<MyHomePage> {
     }
 
     return Column(children: _columnChildren,);
+  }
+
+  Container buildContainer(PieceStatus pieceStatus) {
+    switch(pieceStatus) {
+      case PieceStatus.none:
+        return Container();
+        break;
+      case PieceStatus.circle:
+        return Container(
+          child: Icon(FontAwesomeIcons.circle, size: 60, color: Colors.red,),
+        );
+        break;
+      case  PieceStatus.cross:
+        return Container(
+          child: Icon(Icons.clear, size: 60, color: Colors.blue,),
+        );
+        break;
+      default:
+        return Container();
+    }
+    return Container(
+      child: Icon(FontAwesomeIcons.circle, size: 60,),
+   );
   }
 }
 
