@@ -1,4 +1,5 @@
 import 'dart:html';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -39,6 +40,9 @@ class _MyHomePageState extends State<MyHomePage> {
   bool turnOfCircle = true;
   List<PieceStatus> statusList = List.filled(9, PieceStatus.none);
   GameStatus gameStatus = GameStatus.play;
+  List<Widget>buildline = [Container()];
+  double lineThikness = 6.0;
+  late double lineWidth;
 
   //縦の勝ちパターン
   final List<List<int>> settlementListHorizontal = [
@@ -62,10 +66,10 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    lineWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
       appBar: AppBar(
-
         title: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -92,6 +96,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       turnOfCircle = true;
                       statusList = List.filled(9, PieceStatus.none);
                       gameStatus = GameStatus.play;
+                      buildline = [Container()];
                     });
 
                   },
@@ -177,7 +182,14 @@ class _MyHomePageState extends State<MyHomePage> {
       _rowChildren = [];
     }
 
-    return Column(children: _columnChildren,);
+    return Stack(
+      children: [
+        Column(children: _columnChildren,),
+        Stack(
+          children: buildline,
+        )
+      ],
+    );
   }
 
   Container buildContainer(PieceStatus pieceStatus) {
@@ -210,6 +222,14 @@ class _MyHomePageState extends State<MyHomePage> {
     //行における勝敗のパターンを検証
     for (int i = 0; i < settlementListHorizontal.length; i++) {
       if (statusList[settlementListHorizontal[i][0]] == statusList[settlementListHorizontal[i][1]] && statusList[settlementListHorizontal[i][1]] == statusList[settlementListHorizontal[i][2]] && statusList[settlementListHorizontal[i][0]] != PieceStatus.none) {
+        buildline.add(
+          Container(
+            width: lineWidth,
+            height: lineThikness,
+            color: Colors.black.withOpacity(0.3),
+            margin: EdgeInsets.only(top: lineWidth / 3 * i + lineWidth / 6 - lineThikness / 2),
+          ),
+        );
         gameStatus = GameStatus.settlement;
       }
     }
@@ -217,6 +237,14 @@ class _MyHomePageState extends State<MyHomePage> {
     //列における勝敗のパターンを検証
     for (int i = 0; i < settlementListVertical.length; i++) {
       if (statusList[settlementListVertical[i][0]] == statusList[settlementListVertical[i][1]] && statusList[settlementListVertical[i][1]] == statusList[settlementListVertical[i][2]] && statusList[settlementListVertical[i][0]] != PieceStatus.none) {
+        buildline.add(
+            Container(
+                width: lineWidth,
+                height: lineThikness,
+                color: Colors.black.withOpacity(0.3),
+                margin: EdgeInsets.only(left: lineWidth / 3 * i + lineWidth / 6 - lineThikness / 2),
+            )
+        );
         gameStatus = GameStatus.settlement;
       }
     }
@@ -224,6 +252,18 @@ class _MyHomePageState extends State<MyHomePage> {
     //斜めにおける勝敗のパターンを検証
     for (int i = 0; i < settlementListDiagonal.length; i++) {
       if (statusList[settlementListDiagonal[i][0]] == statusList[settlementListDiagonal[i][1]] && statusList[settlementListDiagonal[i][1]] == statusList[settlementListDiagonal[i][2]] && statusList[settlementListDiagonal[i][0]] != PieceStatus.none) {
+        buildline.add(
+          Transform.rotate(
+            alignment: i == 0 ? Alignment.topLeft : Alignment.topRight,
+            angle: i == 0 ? -pi / 4 : pi / 4,
+            child: Container(
+              width: lineThikness,
+              height: lineWidth * sqrt(2),
+              color: Colors.black.withOpacity(0.3),
+              margin: EdgeInsets.only(left: i == 0 ? 0.0 : lineWidth - lineThikness),
+            ),
+          )
+        );
         gameStatus = GameStatus.settlement;
       }
     }
