@@ -1,4 +1,4 @@
-import 'dart:html';
+//import 'dart:html';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -239,8 +239,8 @@ class _MyHomePageState extends State<MyHomePage> {
       if (statusList[settlementListVertical[i][0]] == statusList[settlementListVertical[i][1]] && statusList[settlementListVertical[i][1]] == statusList[settlementListVertical[i][2]] && statusList[settlementListVertical[i][0]] != PieceStatus.none) {
         buildline.add(
             Container(
-                width: lineWidth,
-                height: lineThikness,
+                width: lineThikness,
+                height: lineWidth,
                 color: Colors.black.withOpacity(0.3),
                 margin: EdgeInsets.only(left: lineWidth / 3 * i + lineWidth / 6 - lineThikness / 2),
             )
